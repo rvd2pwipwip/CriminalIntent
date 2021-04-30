@@ -14,14 +14,12 @@ import androidx.recyclerview.widget.RecyclerView
 
 private const val TAG = "CrimeListFragment"
 
-class CrimeListFragment: Fragment() {
+class NerdCrimeListFragment : Fragment() {
 
-    //associate the fragment with an instance of CrimeListViewModel (the data)
-    private val crimeListViewModel: CrimeListViewModel by viewModels()
-    //declare the adapter
-    private var adapter: CrimeAdapter? = null
-    //declare the recycler view
     private lateinit var crimeRecyclerView: RecyclerView
+    private var adapter: CrimeAdapter? = null
+
+    private val crimeListViewModel: CrimeListViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,6 +32,7 @@ class CrimeListFragment: Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_crime_list, container, false)
+
         crimeRecyclerView = view.findViewById(R.id.crime_recycler_view) as RecyclerView
         crimeRecyclerView.layoutManager = LinearLayoutManager(context)
 
@@ -48,14 +47,19 @@ class CrimeListFragment: Fragment() {
         crimeRecyclerView.adapter = adapter
     }
 
-    private abstract class CrimeHolder(view: View): RecyclerView.ViewHolder(view) {
-        lateinit var crime: Crime
+    companion object {
+        fun newInstance(): CrimeListFragment {
+            return CrimeListFragment()
+        }
+    }
+
+    private abstract class CrimeHolder(view: View) : RecyclerView.ViewHolder(view) {
+        var crime = Crime()
+        val titleTextView: TextView = itemView.findViewById(R.id.crime_title)
+        val dateTextView: TextView = itemView.findViewById(R.id.crime_date)
     }
 
     private inner class NormalCrimeHolder(view: View) : CrimeHolder(view), View.OnClickListener {
-
-        private val titleTextView: TextView = itemView.findViewById(R.id.crime_title)
-        private val dateTextView: TextView = itemView.findViewById(R.id.crime_date)
 
         init {
             itemView.setOnClickListener(this)
@@ -68,12 +72,14 @@ class CrimeListFragment: Fragment() {
         }
 
         override fun onClick(v: View) {
-            Toast.makeText(context, "${crime.title} pressed!", Toast.LENGTH_SHORT)
+            Toast
+                .makeText(context, "${crime.title} pressed!", Toast.LENGTH_SHORT)
                 .show()
         }
     }
 
     private inner class SeriousCrimeHolder(view: View) : CrimeHolder(view), View.OnClickListener {
+//        val contactPoliceButton: Button = itemView.findViewById(R.id.contact_police_button)
 
         init {
             itemView.setOnClickListener(this)
@@ -81,17 +87,24 @@ class CrimeListFragment: Fragment() {
 
         fun bind(crime: Crime) {
             this.crime = crime
+            titleTextView.text = this.crime.title
+            dateTextView.text = this.crime.date.toString()
+//            contactPoliceButton.setOnClickListener {
+//                Toast.makeText(context, "This crime is serious!", Toast. LENGTH_SHORT).show()
+//            }
         }
 
         override fun onClick(v: View) {
-            Toast.makeText(context, "${crime.title} pressed!", Toast.LENGTH_SHORT)
+            Toast
+                .makeText(context, "${crime.title} pressed!", Toast.LENGTH_SHORT)
                 .show()
         }
     }
 
-    private inner class CrimeAdapter(var crimes: List<Crime>): RecyclerView.Adapter<CrimeHolder>() {
-        //only called a few times (enough to fill the container plus a few extras above and below)
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) : CrimeListFragment.CrimeHolder {
+    private inner class CrimeAdapter(var crimes: List<Crime>)
+        : RecyclerView.Adapter<CrimeHolder>() {
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) : CrimeHolder {
             return when (viewType) {
                 0 -> {
                     val view = layoutInflater.inflate(R.layout.list_item_crime, parent, false)
@@ -103,17 +116,17 @@ class CrimeListFragment: Fragment() {
                 }
             }
         }
-        //called each time new data is shown: keep it slick or scroll will crawl
+
+        override fun getItemCount(): Int = crimes.size
+
         override fun onBindViewHolder(holder: CrimeHolder, position: Int) {
             val crime = crimes[position]
             when (holder) {
-                is CrimeListFragment.NormalCrimeHolder -> holder.bind(crime)
-                is CrimeListFragment.SeriousCrimeHolder -> holder.bind(crime)
+                is NormalCrimeHolder -> holder.bind(crime)
+                is SeriousCrimeHolder -> holder.bind(crime)
                 else -> throw IllegalArgumentException()
             }
         }
-
-        override fun getItemCount() = crimes.size
 
         override fun getItemViewType(position: Int): Int {
             val crime = crimes[position]
@@ -121,12 +134,6 @@ class CrimeListFragment: Fragment() {
                 true -> 1
                 else -> 0
             }
-        }
-    }
-
-    companion object {
-        fun newInstance(): CrimeListFragment {
-            return CrimeListFragment()
         }
     }
 }

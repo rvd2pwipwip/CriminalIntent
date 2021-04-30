@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/police_item"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="8dp">
+
+    <TextView
+        android:id="@+id/police_crime"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:background="@color/design_default_color_error"
+        android:text="CONTACT POLICE"
+        android:gravity="center"
+        android:textColor="@color/design_default_color_on_primary"
+        android:textSize="24sp" />
+
+</LinearLayout>
